@@ -19,6 +19,19 @@ SEFARIA_API_BASE = "https://www.sefaria.org/api"
 # Ensure directories exist
 os.makedirs(PARASHOT_DIR, exist_ok=True)
 
+ALIYAH_MAP_FILE = os.path.join(BASE_DIR, "data", "aliyah_map.json")
+HAFTARA_MAP_FILE = os.path.join(BASE_DIR, "data", "haftara_map.json")
+
+ALIYAH_OVERRIDES = {}
+if os.path.exists(ALIYAH_MAP_FILE):
+    with open(ALIYAH_MAP_FILE, 'r') as f:
+        ALIYAH_OVERRIDES = json.load(f).get('overrides', {}).get('yemenite', {})
+
+HAFTARA_MAP = {}
+if os.path.exists(HAFTARA_MAP_FILE):
+    with open(HAFTARA_MAP_FILE, 'r') as f:
+        HAFTARA_MAP = json.load(f)
+
 # Books of the Torah (English and Hebrew names)
 BOOKS = [
     {"english": "Genesis", "hebrew": "בראשית"},
@@ -48,7 +61,8 @@ def clean_text(text):
 
     # 2. Pre-process separators that should become spaces
     # Maqaf (05BE) and Hyphen (-) should separate words
-    text = re.sub(r'[\-\u05BE]', ' ', text)
+    # FIX: Do NOT separate with spaces. Keep connected for correct tokenization match with Taj.
+    # text = re.sub(r'[\-\u05BE]', ' ', text)
 
     # 3. Remove Vowels and Cantillation (Trope)
     # Cantillation: 0591-05AF
@@ -130,20 +144,27 @@ def fetch_parashot_for_book(book_name):
         print(f"Error fetching index for {book_name}: {e}")
         return []
 
-def fetch_text(ref):
-    """Fetches Hebrew (Standard & Yemenite) and Onkelos text for a given ref."""
+def fetch_text(ref, is_haftara=False):
+    """Fetches Hebrew (Standard & Yemenite) and Onkelos/Jonathan text for a given ref."""
     
     # 1. Fetch Standard Hebrew (Tanach with Ta'amei Hamikra)
     url_std = f"{SEFARIA_API_BASE}/texts/{ref}?context=0&commentary=0&versionTitle=Tanach with Ta'amei Hamikra"
     
     # 2. Fetch Yemenite Hebrew (Miqra according to the Masorah)
-    # Using underscores as requested, though Sefaria usually handles spaces too.
     url_yem = f"{SEFARIA_API_BASE}/texts/{ref}?context=0&commentary=0&versionTitle=Miqra_according_to_the_Masorah"
 
-    # 3. Fetch Onkelos
-    book_name = ref.split()[0]
-    onkelos_ref = f"Onkelos {ref}"
-    url_onk = f"{SEFARIA_API_BASE}/texts/{onkelos_ref}?context=0&commentary=0"
+    # 3. Fetch Targum
+    # If Haftarah (Prophets), use Targum Jonathan. If Torah, use Onkelos.
+    # Note: Sefaria might name it "Targum Jonathan on [Book]" or just "Targum Jonathan".
+    # Reliable check: First word of Ref is the Book.
+    book = ref.split()[0]
+    
+    if is_haftara or book not in ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy"]:
+        # Prophets
+        url_onk = f"{SEFARIA_API_BASE}/texts/Targum_Jonathan_on_{ref.replace(' ', '_')}?context=0&commentary=0"
+    else:
+        # Torah
+        url_onk = f"{SEFARIA_API_BASE}/texts/Onkelos_{ref.replace(' ', '_')}?context=0&commentary=0"
     
     data_std = None
     data_yem = None
@@ -190,78 +211,124 @@ def clean_html_and_spaces(text):
     # Collapse multiple spaces
     return ' '.join(text.split())
 
-def process_parasha(parasha):
-    """Fetches data, processes it, and saves to JSON."""
-    print(f"Processing {parasha['name']} ({parasha['ref']})...")
+def extract_verses_with_meta(he_data, start_chapter, start_verse):
+    """
+    Traverses the he_data (list or list of lists) and returns a flat list of 
+    dict(text=..., chapter=..., verse=...)
+    """
+    results = []
     
+    if not he_data:
+        return []
+        
+    # Depth 1: List of strings (Single chapter segment)
+    if isinstance(he_data[0], str):
+        for i, text in enumerate(he_data):
+            results.append({
+                "text": text,
+                "chapter": start_chapter,
+                "verse": start_verse + i
+            })
+            
+    # Depth 2: List of lists (Spanning chapters)
+    elif isinstance(he_data[0], list):
+        # First chunk: continues from start_verse
+        for i, text in enumerate(he_data[0]):
+            results.append({
+                "text": text,
+                "chapter": start_chapter,
+                "verse": start_verse + i
+            })
+            
+        # Subsequent chunks: next chapters, starting at verse 1
+        current_chapter = start_chapter + 1
+        for chunk in he_data[1:]:
+            for i, text in enumerate(chunk):
+                results.append({
+                    "text": text,
+                    "chapter": current_chapter,
+                    "verse": 1 + i
+                })
+            current_chapter += 1
+            
+    return results
+
+def fetch_aliyah_data(aliyah_refs, is_haftara=False):
+    """
+    Fetches and processes data for a given list of Aliyah references.
+    Returns: (aliyot_data, all_verses_flat)
+    """
     aliyot_data = []
     all_verses_flat = []
-    
-    # Helper to flatten nested lists
-    def flatten(text_list):
-        flat = []
-        if isinstance(text_list, str):
-            return [text_list]
-        for item in text_list:
-            if isinstance(item, list):
-                flat.extend(flatten(item))
-            else:
-                flat.append(item)
-        return flat
-
-    # Use the aliyot list from metadata, or fallback to the whole ref if list is empty/missing
-    ref_list = parasha.get('aliyot')
-    if not ref_list:
-        ref_list = [parasha['ref']]
-
     global_verse_count = 0
 
-    for idx, aliyah_ref in enumerate(ref_list):
+    for idx, aliyah_ref in enumerate(aliyah_refs):
         # Fetch text for this specific aliyah range
-        std_data, yem_data, onk_data = fetch_text(aliyah_ref)
+        std_data, yem_data, onk_data = fetch_text(aliyah_ref, is_haftara=is_haftara)
         
         if not std_data or not std_data.get('he'):
             print(f"  Warning: No Standard data for aliyah {aliyah_ref}")
             continue
-            
-        std_flat = flatten(std_data['he'])
         
+        # Parse Section Metadata
+        sections = std_data.get('sections', [0, 0])
+        if len(sections) < 2: 
+            sections = [0, 0]
+        
+        start_chapter = sections[0]
+        start_verse = sections[1]
+        
+        # Flatten Standard with Metadata
+        std_with_meta = extract_verses_with_meta(std_data['he'], start_chapter, start_verse)
+        
+        # Helper to flatten text lists
+        def flatten(text_list):
+            flat = []
+            if isinstance(text_list, str): return [text_list]
+            for item in text_list:
+                if isinstance(item, list): flat.extend(flatten(item))
+                else: flat.append(item)
+            return flat
+
         # Prepare Yemenite flat list
         yem_flat = []
         if yem_data and yem_data.get('he'):
             yem_flat = flatten(yem_data['he'])
         
-        # If Yemenite is missing or length mismatch, use Standard as fallback
-        if not yem_flat or len(yem_flat) != len(std_flat):
-            # If length mismatch, it's safer to fallback to standard to avoid misalignment
-            if yem_flat and len(yem_flat) != len(std_flat):
-                 print(f"  Warning: Yemenite/Standard length mismatch for {aliyah_ref} ({len(yem_flat)} vs {len(std_flat)}). Using Standard.")
-            yem_flat = std_flat[:]
+        # Fallback if Yemenite missing/mismatch
+        if not yem_flat or len(yem_flat) != len(std_with_meta):
+            if yem_flat and len(yem_flat) != len(std_with_meta):
+                 print(f"  Warning: Yemenite/Standard length mismatch for {aliyah_ref} ({len(yem_flat)} vs {len(std_with_meta)}). Using Standard.")
+            yem_flat = [item['text'] for item in std_with_meta]
 
-        # Onkelos might be missing for some verses? Usually 1:1 match.
+        # Onkelos
         onk_flat = []
         if onk_data and 'he' in onk_data:
             onk_flat = flatten(onk_data['he'])
         
-        # Pad Onkelos if shorter
-        if len(onk_flat) < len(std_flat):
-            onk_flat.extend([""] * (len(std_flat) - len(onk_flat)))
+        if len(onk_flat) < len(std_with_meta):
+            onk_flat.extend([""] * (len(std_with_meta) - len(onk_flat)))
             
         aliyah_verses = []
-        for i, std_text in enumerate(std_flat):
+        for i, std_item in enumerate(std_with_meta):
             global_verse_count += 1
             
-            # Clean HTML and entities
+            std_text = std_item['text']
+            verse_ch = std_item['chapter']
+            verse_v = std_item['verse']
+            
             clean_std = clean_html_and_spaces(std_text)
             clean_yem = clean_html_and_spaces(yem_flat[i])
             clean_onk = clean_html_and_spaces(onk_flat[i])
             
-            # Generate "Clean" version (no vowel/trope)
-            simple_std = clean_text(clean_std)
-            simple_yem = clean_text(clean_yem)
+            # Skip cleaning for Haftara (we don't need Tikun/Clean text)
+            simple_std = "" if is_haftara else clean_text(clean_std)
+            simple_yem = "" if is_haftara else clean_text(clean_yem)
             
             verse_obj = {
                 "verse_num": global_verse_count,
+                "chapter": verse_ch,
+                "verse": verse_v,
                 "versions": {
                     "standard": {
                         "text_full": clean_std,
@@ -277,15 +344,25 @@ def process_parasha(parasha):
             aliyah_verses.append(verse_obj)
             all_verses_flat.append(verse_obj)
         
-        # Add to Aliyot structure
         aliyot_data.append({
             "num": idx + 1,
             "range": aliyah_ref,
             "verses": aliyah_verses
         })
-        
-        # Be nice to API between aliyot calls
         time.sleep(0.1)
+        
+    return aliyot_data, all_verses_flat
+
+def process_parasha(parasha):
+    """Fetches data, processes it, and saves to JSON."""
+    print(f"Processing {parasha['name']} ({parasha['ref']})...")
+    
+    # 1. Standard Processing
+    ref_list = parasha.get('aliyot')
+    if not ref_list:
+        ref_list = [parasha['ref']]
+        
+    aliyot_data, all_verses_flat = fetch_aliyah_data(ref_list)
 
     if not all_verses_flat:
         return False
@@ -299,6 +376,65 @@ def process_parasha(parasha):
         "verses": all_verses_flat
     }
     
+    # 2. Check for Yemenite Override
+    # Normalize ID to lowercase for lookup
+    p_id = parasha['id'].lower().replace("parashat ", "").replace("parshat ", "").replace(" ", "-")
+    
+    # Direct lookup or fuzzy match? The IDs in manifest are like "korach", "chukat".
+    # Map file has "korach", "chukat".
+    
+    # Try to find a match in the overrides
+    override = ALIYAH_OVERRIDES.get(p_id)
+    if not override:
+        # Try simplified ID (e.g. "Parashat Korach" -> "korach")
+        simplified_id = p_id.split("-")[-1] 
+        override = ALIYAH_OVERRIDES.get(simplified_id)
+
+    if override:
+        print(f"  Applying Yemenite Override for {parasha['name']}...")
+        yem_ref_list = override.get('aliyot')
+        if yem_ref_list:
+            yem_aliyot_data, _ = fetch_aliyah_data(yem_ref_list)
+            output_data["aliyot_yemenite"] = yem_aliyot_data
+            output_data["ref_yemenite"] = override.get('ref')
+            output_data["is_override"] = True
+
+    # 3. Add Haftarah
+    # Lookup in map
+    haftara_entry = HAFTARA_MAP.get(parasha['id']) or HAFTARA_MAP.get(p_id)
+    
+    if haftara_entry:
+        std_haftara_ref = haftara_entry.get('standard')
+        yem_haftara_ref = haftara_entry.get('yemenite')
+        
+        # Clean refs (remove extra chars if any, like [73])
+        if std_haftara_ref:
+            std_haftara_ref = re.sub(r'\[\d+\]', '', std_haftara_ref).strip()
+            # Replace en-dash with hyphen for Sefaria API compatibility if needed
+            std_haftara_ref = std_haftara_ref.replace('–', '-').replace('—', '-') 
+            
+            print(f"  Fetching Haftarah (Standard): {std_haftara_ref}")
+            # Use same logic as Aliyah (it's essentially an aliyah)
+            # Wrap in list because fetch_aliyah_data expects a list of refs (like 7 aliyot)
+            # but Haftara is one block.
+            haftara_data_list, _ = fetch_aliyah_data([std_haftara_ref], is_haftara=True)
+            if haftara_data_list:
+                output_data["haftara"] = haftara_data_list[0]
+                # Fix num/range if needed
+                output_data["haftara"]["num"] = 8 # Convention? Or just leave as 1 relative to haftara list?
+                # Actually, Trainer.tsx expects it as a single Aliyah object, not array.
+                # fetch_aliyah_data returns [Aliyah, Aliyah...]. We take [0].
+        
+        if yem_haftara_ref and yem_haftara_ref != std_haftara_ref:
+            yem_haftara_ref = re.sub(r'\[\d+\]', '', yem_haftara_ref).strip()
+            yem_haftara_ref = yem_haftara_ref.replace('–', '-').replace('—', '-')
+            
+            print(f"  Fetching Haftarah (Yemenite): {yem_haftara_ref}")
+            yem_haftara_data_list, _ = fetch_aliyah_data([yem_haftara_ref], is_haftara=True)
+            if yem_haftara_data_list:
+                output_data["haftara_yemenite"] = yem_haftara_data_list[0]
+                output_data["haftara_yemenite"]["num"] = 8
+
     filename = f"{parasha['id']}.json"
     filepath = os.path.join(PARASHOT_DIR, filename)
     

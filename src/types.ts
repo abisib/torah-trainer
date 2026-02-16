@@ -7,6 +7,8 @@ export interface VerseVersion {
 
 export interface Verse {
   verse_num: number;
+  chapter?: number;
+  verse?: number;
   text_full: string;
   text_clean: string;
   targum: string;
@@ -29,6 +31,11 @@ export interface VerseData {
   ref: string;
   verses: Verse[];
   aliyot: Aliyah[];
+  haftara?: Aliyah;
+  aliyot_yemenite?: Aliyah[];
+  haftara_yemenite?: Aliyah;
+  ref_yemenite?: string;
+  is_override?: boolean;
 }
 
 export interface Parasha {

@@ -11,7 +11,6 @@ export default function BookView() {
     fetch('/data/manifest.json')
       .then((res) => res.json())
       .then((data: Book[]) => {
-        // Find the book matching the URL param (case-insensitive)
         const foundBook = data.find(
           (b) => b.book.toLowerCase() === bookId?.toLowerCase()
         );
@@ -26,58 +25,66 @@ export default function BookView() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen text-gray-500">
-        Loading Book...
+      <div className="flex justify-center items-center h-screen text-slate-400">
+        <div className="animate-pulse">טוען פרשות...</div>
       </div>
     );
   }
 
   if (!book) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen text-gray-500">
-        <h2 className="text-2xl font-bold mb-4">Book Not Found</h2>
-        <Link to="/" className="text-blue-600 hover:underline">
-          Return Home
+      <div className="flex flex-col items-center justify-center h-screen text-slate-500">
+        <h2 className="text-3xl font-bold mb-6">חומש לא נמצא</h2>
+        <Link to="/" className="px-6 py-3 bg-slate-900 text-white rounded-xl shadow-lg hover:bg-slate-800 transition-colors">
+          חזרה לבית
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 font-sans" dir="rtl">
-      <div className="max-w-4xl mx-auto">
-        <Link
-          to="/"
-          className="inline-flex items-center text-gray-500 hover:text-gray-800 mb-8 transition-colors"
-        >
-          <span className="ml-2">→</span> חזרה לרשימת החומשים
-        </Link>
+    <div className="min-h-screen bg-slate-50 p-6 md:p-12 font-sans" dir="rtl">
+      <div className="max-w-5xl mx-auto">
+        <nav className="mb-12">
+          <Link
+            to="/"
+            className="inline-flex items-center text-slate-500 hover:text-slate-900 transition-colors bg-white px-4 py-2 rounded-full shadow-sm hover:shadow-md"
+          >
+            <span className="ml-2 text-xl">→</span> חזרה לספרייה
+          </Link>
+        </nav>
 
-        <header className="mb-8 border-b pb-6">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{book.hebrew}</h1>
-          <span className="text-xl text-gray-500 font-light uppercase tracking-wide">
+        <header className="mb-12">
+          <h1 className="text-6xl font-black text-slate-900 mb-2">{book.hebrew}</h1>
+          <div className="h-1.5 w-24 bg-amber-500 rounded-full mb-4"></div>
+          <span className="text-xl text-slate-400 font-medium tracking-widest uppercase">
             {book.book}
           </span>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {book.parashot.map((parasha) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {book.parashot.map((parasha, index) => (
             <Link
               key={parasha.id}
               to={`/read/${parasha.id}`}
-              className="group block p-5 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex justify-between items-center"
+              className="group block bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-slate-100"
             >
-              <div>
-                <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-700">
-                  {parasha.hebrew || parasha.name}
-                </h3>
-                <span className="text-sm text-gray-400 font-mono mt-1 block">
-                  {parasha.ref}
+              <div className="flex justify-between items-start mb-4">
+                <div className="bg-slate-50 text-slate-400 text-xs font-bold px-3 py-1 rounded-full">
+                  #{index + 1}
+                </div>
+                <span className="text-slate-300 group-hover:text-amber-500 transition-colors transform group-hover:-translate-x-1">
+                  ←
                 </span>
               </div>
-              <span className="text-gray-300 group-hover:text-blue-500 transform group-hover:-translate-x-1 transition-transform">
-                ←
-              </span>
+              
+              <h3 className="text-2xl font-bold text-slate-800 mb-2 group-hover:text-slate-900">
+                {parasha.hebrew || parasha.name}
+              </h3>
+              
+              <div className="text-sm text-slate-400 font-mono bg-slate-50 inline-block px-2 py-1 rounded">
+                {parasha.ref}
+              </div>
             </Link>
           ))}
         </div>

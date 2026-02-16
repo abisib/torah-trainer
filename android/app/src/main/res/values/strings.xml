@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TorahTrainer</string>
+    <string name="title_activity_main">TorahTrainer</string>
+    <string name="package_name">com.torahtrainer.app</string>
+    <string name="custom_url_scheme">com.torahtrainer.app</string>
+</resources>

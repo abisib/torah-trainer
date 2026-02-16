@@ -1,0 +1,29 @@
+{
+  "overrides": {
+    "yemenite": {
+      "korach": {
+        "description": "Combined Korach + Start of Chukat (Minhag Teiman)",
+        "ref": "Numbers 16:1-20:21",
+        "aliyot": [
+          "Numbers 16:1-16:13",
+          "Numbers 16:14-16:19",
+          "Numbers 16:20-17:8",
+          "Numbers 17:9-17:24",
+          "Numbers 17:25-18:20",
+          "Numbers 18:21-18:32",
+          "Numbers 19:1-20:21"
+        ]
+      },
+      "chukat": {
+        "description": "Remainder of Chukat (Minhag Teiman)",
+        "ref": "Numbers 20:22-22:1",
+        "aliyot": [
+          "Numbers 20:22-21:10",
+          "Numbers 21:11-21:20",
+          "Numbers 21:21-21:35",
+          "Numbers 22:1-22:1" 
+        ]
+      }
+    }
+  }
+}

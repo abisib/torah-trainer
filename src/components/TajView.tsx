@@ -1,50 +1,53 @@
+import { toHebrewNumeral } from '../utils/hebrewNumerals';
 import type { Aliyah } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 
 interface TajViewProps {
-  aliyot: Aliyah[];
+  aliyah: Aliyah;
+  aliyahName: string;
 }
 
-const ALIYAH_NAMES = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר"];
-
-export default function TajView({ aliyot }: TajViewProps) {
+export default function TajView({ aliyah, aliyahName }: TajViewProps) {
   const { nusach } = useSettings();
 
   return (
-    <div className="p-6 h-full overflow-y-auto bg-gray-50 font-serif scroll-smooth" dir="rtl">
-      <div className="max-w-4xl mx-auto">
-        {aliyot.map((aliyah, idx) => (
-          <div key={aliyah.num} className="mb-8">
-            <div className="flex items-center gap-2 mb-4 sticky top-0 bg-gray-50/95 py-2 z-10 backdrop-blur-sm border-b border-gray-200">
-               <span className="text-lg font-bold text-blue-800 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-                 {ALIYAH_NAMES[idx] || `עליה ${aliyah.num}`}
-               </span>
-               <span className="text-sm text-gray-500 font-sans" dir="ltr">
-                 {aliyah.range}
-               </span>
-            </div>
+    <div className="p-4 md:p-8 h-full overflow-y-auto bg-slate-50 font-serif scroll-smooth" dir="rtl">
+      <div className="text-center pb-6">
+        <h2 className="text-2xl font-bold text-slate-800 font-sans">{aliyahName}</h2>
+        <div className="h-1 w-12 bg-blue-500/20 mx-auto mt-2 rounded-full"></div>
+      </div>
+      <div className="max-w-4xl mx-auto pb-20">
+        <div className="space-y-4">
+          {aliyah.verses.map((verse) => {
+            const textFull = verse.versions?.[nusach]?.text_full || verse.text_full;
             
-            <div className="space-y-4">
-              {aliyah.verses.map((verse) => {
-                const textFull = verse.versions?.[nusach]?.text_full || verse.text_full;
-                
-                return (
-                  <div key={verse.verse_num} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="text-xl font-bold mb-2 font-serif text-gray-900 leading-relaxed">
-                      <span className="text-sm font-sans text-gray-400 font-normal ml-3 select-none inline-block min-w-[1.5rem]">
-                        {verse.verse_num}.
-                      </span>
+            return (
+              <div key={verse.verse_num} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-200 group overflow-hidden">
+                <div className="flex gap-4">
+                  {/* Verse Number */}
+                  <div className="flex-shrink-0 pt-1 text-right">
+                    <span className="text-xs font-sans text-slate-300 font-bold group-hover:text-amber-500 transition-colors block">
+                      {verse.chapter && verse.verse 
+                        ? `${toHebrewNumeral(verse.chapter)}:${toHebrewNumeral(verse.verse)}`
+                        : toHebrewNumeral(verse.verse_num)
+                      }
+                    </span>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-grow">
+                    <div className="text-2xl font-bold mb-4 font-serif text-slate-900 leading-relaxed">
                       {textFull}
                     </div>
-                    <div className="text-lg text-gray-600 font-serif leading-relaxed border-t pt-2 border-gray-100 mt-2">
+                    <div className="text-lg text-slate-500 font-serif leading-relaxed border-t border-slate-50 pt-4">
                       {verse.targum}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

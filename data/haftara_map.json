@@ -1,0 +1,218 @@
+{
+  "bereshis": {
+    "standard": "Isaiah 42:5\u201343:10",
+    "yemenite": "Isaiah 42:1\u201316"
+  },
+  "parshat-noah": {
+    "standard": "Second Kings 4:1-37",
+    "yemenite": "Second Kings 4:1-37"
+  },
+  "parashat-lekh-lekha": {
+    "standard": "First Kings 1:1\u201331",
+    "yemenite": "First Kings 1:1\u201331"
+  },
+  "parshat-vayera": {
+    "standard": "Malachi 1:1-2:7",
+    "yemenite": "Malachi 1:1\u20133:4"
+  },
+  "hayye-sarah": {
+    "standard": "Hosea 12:13\u201314:10",
+    "yemenite": "Hosea 12:13\u201314:10"
+  },
+  "toldos": {
+    "standard": "Obadiah 1:1-21",
+    "yemenite": "Obadiah 1:1-21"
+  },
+  "parashat-vayetzey": {
+    "standard": "Hosea 12:13-14:9;",
+    "yemenite": "Hosea 12:13-14:9;"
+  },
+  "parashat-vayishlach": {
+    "standard": "Amos 2:6\u20133:8",
+    "yemenite": "Amos 2:6\u20133:8"
+  },
+  "parshat-vayeshev": {
+    "standard": "First Kings 3:15-4:1",
+    "yemenite": "First Kings 3:15-4:1"
+  },
+  "parashat-miketz": {
+    "standard": "Ezekiel 37:15-28",
+    "yemenite": "Ezekiel 37:15-28"
+  },
+  "parashat-vayigash": {
+    "standard": "First Kings 2:1-12",
+    "yemenite": "First Kings 2:1-12"
+  },
+  "parashat-vayehi": {
+    "standard": "Isaiah 27:6\u201328:13 & 29:22\u201323",
+    "yemenite": "Isaiah 27:6\u201328:13 & 29:22\u201323"
+  },
+  "sh'mot": {
+    "standard": "Ezekiel 16:1\u201314",
+    "yemenite": "Ezekiel 28:24-29:21"
+  },
+  "parshat-vaera": {
+    "standard": "Jeremiah 46:13\u201328",
+    "yemenite": "Jeremiah 46:13\u201328"
+  },
+  "parashat-bo": {
+    "standard": "Isaiah 19:1\u201319:25",
+    "yemenite": "Isaiah 19:1\u201319:25"
+  },
+  "parashat-beshalach": {
+    "standard": "Judges 4:4-5:31",
+    "yemenite": "Judges 4:23\u20135:31"
+  },
+  "jethro": {
+    "standard": "4-24",
+    "yemenite": "4-24"
+  },
+  "parashat-mishpatim": {
+    "standard": "Isaiah 6:1-7:6 & 9:5-6",
+    "yemenite": "Isaiah 6:1-6:13 & 9:5-6"
+  },
+  "t'rumah": {
+    "standard": "Jeremiah 34:8-22 & 33:25-26",
+    "yemenite": "Jeremiah 34:8\u201335:19"
+  },
+  "parashat-teztaveh": {
+    "standard": "First Kings 5:26-6:13",
+    "yemenite": "First Kings 5:26-6:13"
+  },
+  "ki-tissa": {
+    "standard": "Ezekiel 43:10-27",
+    "yemenite": "Ezekiel 43:10-27"
+  },
+  "parshat-vayakel": {
+    "standard": "First Kings 18:1-39",
+    "yemenite": "First Kings 18:1-46"
+  },
+  "parashat-pikudei": {
+    "standard": "First Kings 7:40\u201350",
+    "yemenite": "First Kings 7:13\u201322"
+  },
+  "parashat-vayikra": {
+    "standard": "Isaiah 43:21\u201344:23",
+    "yemenite": "Isaiah 43:21\u201344:6"
+  },
+  "parashat-tzav": {
+    "standard": "Jeremiah 7:21\u20138:3; 9:22\u201323",
+    "yemenite": "Jeremiah 7:21\u20138:3; 9:22\u201323"
+  },
+  "shemini": {
+    "standard": "Second Samuel 6:1\u20137:17",
+    "yemenite": "Second Samuel 6:1\u20137:3"
+  },
+  "parshat-tazria": {
+    "standard": "Second Kings 4:42\u20135:19",
+    "yemenite": "Second Kings 4:42\u20135:19"
+  },
+  "parashat-metzorah": {
+    "standard": "Second Kings 7:3\u201320",
+    "yemenite": "Second Kings 7:1\u201320 & 13:23"
+  },
+  "parashat-acharei-mot": {
+    "standard": "Amos 9:7-15",
+    "yemenite": "Amos 9:7-15"
+  },
+  "parashat-kedoshim": {
+    "standard": "Ezekiel 22:1-19",
+    "yemenite": "Ezekiel 22:1-19"
+  },
+  "parshat-emor": {
+    "standard": "Amos 9:7-15",
+    "yemenite": "Amos 9:7-15"
+  },
+  "parashat-behar": {
+    "standard": "Ezekiel 22:1-16",
+    "yemenite": "Ezekiel 22:1-16"
+  },
+  "bekhukotai": {
+    "standard": "[69] Amos 9:7-15",
+    "yemenite": "[69] Amos 9:7-15"
+  },
+  "numbers": {
+    "standard": "[70] Ezekiel 22:2-16",
+    "yemenite": "[70] Ezekiel 22:2-16"
+  },
+  "naso": {
+    "standard": "Ezekiel 20:1-20",
+    "yemenite": "Ezekiel 20:1-20"
+  },
+  "behaloscha": {
+    "standard": "Jeremiah 32:6-27",
+    "yemenite": "Jeremiah 16:19-17:14"
+  },
+  "shlach": {
+    "standard": "Ezekiel 34:1\u201315[73]",
+    "yemenite": "Ezekiel 34:1\u201327"
+  },
+  "parashat-korach": {
+    "standard": "Judges 13:2\u201325",
+    "yemenite": "Judges 13:2\u201324"
+  },
+  "parshat-chukkat": {
+    "standard": "Zechariah 2:14\u20134:7",
+    "yemenite": "Zechariah 2:14\u20134:9"
+  },
+  "parshat-balak": {
+    "standard": "Joshua 2:1\u201324",
+    "yemenite": "Joshua 2:1\u201324"
+  },
+  "parashat-pinchas": {
+    "standard": "First Samuel 11:14\u201312:22",
+    "yemenite": "First Samuel 11:14\u201312:22"
+  },
+  "parshat-matot": {
+    "standard": "Judges 11:1\u201333",
+    "yemenite": "Judges 11:1\u201340"
+  },
+  "parshat-masei": {
+    "standard": "Micah 5:6-6:8",
+    "yemenite": "Micah 5:6-6:8"
+  },
+  "d'varim": {
+    "standard": "First Kings 18:46-19:21",
+    "yemenite": "First Kings 18:46-19:21"
+  },
+  "v'ethanan": {
+    "standard": "Jeremiah 1:1-2:3",
+    "yemenite": "Jeremiah 1:1-2:3"
+  },
+  "parashat-ekev": {
+    "standard": "Isaiah 1:1-27",
+    "yemenite": "Isaiah 1:21-31"
+  },
+  "parashat-re'eh": {
+    "standard": "1\u201310",
+    "yemenite": "1\u201310"
+  },
+  "shofetim": {
+    "standard": "Isaiah 51:12\u201352:12",
+    "yemenite": "Isaiah 51:12\u201352:12"
+  },
+  "ki-teitze": {
+    "standard": "Hosea 14:2\u201310, and Joel 2:15\u201327, and Micah 7:18\u201320",
+    "yemenite": "Hosea 14:2\u201310, and Joel 2:15\u201327, and Micah 7:18\u201320"
+  },
+  "parashat-ki-tavo": {
+    "standard": "Check manually",
+    "yemenite": "Check manually"
+  },
+  "parshat-nitzavim": {
+    "standard": "Check manually",
+    "yemenite": "Check manually"
+  },
+  "vayelekh": {
+    "standard": "Check manually",
+    "yemenite": "Check manually"
+  },
+  "haazinu": {
+    "standard": "Check manually",
+    "yemenite": "Check manually"
+  },
+  "parashat-v'zot-haberachah": {
+    "standard": "Check manually",
+    "yemenite": "Check manually"
+  }
+}

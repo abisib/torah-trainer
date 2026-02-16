@@ -1,10 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+:root {
+  font-family: 'Rubik', sans-serif;
+}
 
 @font-face {
-  font-family: 'StamCustom';
-  src: url('./assets/fonts/StamAshkenazCLM.ttf') format('truetype');
+  font-family: 'StamAshkenaz';
+  src: url('./assets/fonts/StamAshkenazCLM.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'StamSefarad';
+  src: url('./assets/fonts/StamSefaradCLM.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }

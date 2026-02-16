@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Capacitor } from '@capacitor/core';
 
 interface HintTooltipProps {
   word: string;
@@ -13,10 +15,21 @@ export default function HintTooltip({ word, hint, active }: HintTooltipProps) {
     return <span className="inline-block ms-1">{word}</span>;
   }
 
+  const handleClick = async () => {
+    setIsClicked(!isClicked);
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await Haptics.impact({ style: ImpactStyle.Light });
+      } catch (err) {
+        // Ignore haptic errors
+      }
+    }
+  };
+
   return (
     <span 
       className="relative inline-block ms-1 cursor-pointer group"
-      onClick={() => setIsClicked(!isClicked)}
+      onClick={handleClick}
     >
       <span className="border-b border-transparent hover:border-blue-400 hover:bg-blue-50 transition-colors duration-150 rounded-sm px-0.5">
         {word}
