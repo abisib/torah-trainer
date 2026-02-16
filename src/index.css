@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'StamCustom';
+  src: url('./assets/fonts/StamAshkenazCLM.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}

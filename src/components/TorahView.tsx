@@ -106,10 +106,10 @@ export default function TorahView({ aliyot }: TorahViewProps) {
         <div 
           className="mx-auto min-h-[600px] text-justify font-bold text-black"
           style={{ 
-            fontFamily: "'Frank Ruhl Libre', serif",
-            fontSize: '26px',
-            lineHeight: '1.3',
-            maxWidth: '450px',
+            fontFamily: "'StamCustom', 'Frank Ruhl Libre', serif",
+            fontSize: '32px',
+            lineHeight: '1.6',
+            maxWidth: '550px',
             textAlignLast: 'justify',
             direction: 'rtl',
             whiteSpace: 'pre-wrap'

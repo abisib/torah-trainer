@@ -1,20 +1,13 @@
-Refactored the Torah Trainer UI to support Split-Screen (Side-by-Side) viewing.
+Phase 4 Status: COMPLETE
 
-Accomplished:
-1.  Created `src/components/TorahView.tsx`:
-    - Renders unvowelized text as a continuous block.
-    - Mimics a scroll with justified text and large serif font.
-    - Integrates `HintTooltip` for word-by-word hover hints.
-    - Handles `{פ}` and `{ס}` markers visually.
+1. Designer (Text/Fonts): VERIFIED.
+   - Text cleaning: Validated `shirat_hayam.json` (no `|` found) and `TorahView.tsx` (safety filter active).
+   - Fonts: Validated `Frank Ruhl Libre` in `index.html` and `TorahView.tsx`.
 
-2.  Created `src/components/TajView.tsx`:
-    - Renders the full text (bold) and Targum (gray) in a list format.
-    - Includes verse numbers for easy reference.
+2. Architect (Column/Page Logic): VERIFIED.
+   - Implemented in `TorahView.tsx` via `WORDS_PER_PAGE` pagination.
+   - Visuals: Justified text and max-width layout mimic a Torah column.
 
-3.  Refactored `src/App.tsx`:
-    - Implemented a responsive layout.
-    - **Desktop (>=768px):** Split-screen with independent scrolling for Torah (Target) and Taj (Source).
-    - **Mobile (<768px):** Tabbed interface with a switcher in the header.
-    - Moved data loading logic to `App.tsx`.
-
-The UI now supports effective study with side-by-side comparison on desktop and focused single-view on mobile.
+3. Deployment: COMPLETE.
+   - Deployed to Vercel Production.
+   - URL: https://torahtrainer-8un15flq7-itamars-projects-37cdb905.vercel.app

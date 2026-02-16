@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import TorahView from './TorahView';
 import TajView from './TajView';
+import CombinedView from './CombinedView';
 import { useTorahData } from '../hooks/useTorahData';
 import { useSettings } from '../contexts/SettingsContext';
 import { type Book, type Parasha } from '../types';
@@ -11,8 +12,10 @@ const Trainer: React.FC = () => {
   const { data, loading, error } = useTorahData(parashaId || '');
   const { nusach, setNusach } = useSettings();
   
-  // Mobile Tab State
-  const [activeTab, setActiveTab] = useState<'torah' | 'taj'>('torah');
+  // View State
+  const [mobileView, setMobileView] = useState<'torah' | 'taj' | 'combined'>('torah');
+  const [desktopView, setDesktopView] = useState<'split' | 'combined'>('split');
+  
   const [allParashot, setAllParashot] = useState<Parasha[]>([]);
 
   useEffect(() => {
@@ -82,12 +85,36 @@ const Trainer: React.FC = () => {
              </div>
           </div>
           
-          {/* Mobile Tab Switcher */}
+          {/* Desktop View Switcher */}
+          <div className="hidden md:flex bg-gray-100 p-1 rounded-lg ml-4">
+            <button
+              onClick={() => setDesktopView('split')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                desktopView === 'split' 
+                  ? 'bg-white text-blue-700 shadow-sm' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              מפוצל (רגיל)
+            </button>
+            <button
+              onClick={() => setDesktopView('combined')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                desktopView === 'combined' 
+                  ? 'bg-white text-blue-700 shadow-sm' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              משולב (לימוד)
+            </button>
+          </div>
+          
+          {/* Mobile View Switcher (3-way) */}
           <div className="flex md:hidden bg-gray-100 p-1 rounded-lg">
             <button
-              onClick={() => setActiveTab('torah')}
-              className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${
-                activeTab === 'torah' 
+              onClick={() => setMobileView('torah')}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                mobileView === 'torah' 
                   ? 'bg-white text-blue-700 shadow-sm' 
                   : 'text-gray-500 hover:text-gray-700'
               }`}
@@ -95,14 +122,24 @@ const Trainer: React.FC = () => {
               תיקון
             </button>
             <button
-              onClick={() => setActiveTab('taj')}
-              className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${
-                activeTab === 'taj' 
+              onClick={() => setMobileView('taj')}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                mobileView === 'taj' 
                   ? 'bg-white text-blue-700 shadow-sm' 
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               תאג׳
+            </button>
+            <button
+              onClick={() => setMobileView('combined')}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                mobileView === 'combined' 
+                  ? 'bg-white text-blue-700 shadow-sm' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              משולב
             </button>
           </div>
         </div>
@@ -111,34 +148,48 @@ const Trainer: React.FC = () => {
       {/* Main Content Area */}
       <main className="flex-grow overflow-hidden relative w-full">
         
-        {/* Desktop: Split Screen */}
-        <div className="hidden md:grid md:grid-cols-2 h-full divide-x divide-x-reverse divide-gray-200">
-          {/* Left: Torah (Target) */}
-          <div className="h-full overflow-hidden flex flex-col bg-[#fdfbf7]">
-             <div className="bg-[#f4f1ea] p-2 text-center text-xs font-bold text-gray-500 border-b border-[#eaddc5]">
-               תיקון קוראים
-             </div>
-             <TorahView aliyot={data.aliyot} />
-          </div>
+        {/* Desktop View */}
+        <div className="hidden md:block h-full">
+          {desktopView === 'split' ? (
+            <div className="grid grid-cols-2 h-full divide-x divide-x-reverse divide-gray-200">
+              {/* Left: Torah (Target) */}
+              <div className="h-full overflow-hidden flex flex-col bg-[#fdfbf7]">
+                 <div className="bg-[#f4f1ea] p-2 text-center text-xs font-bold text-gray-500 border-b border-[#eaddc5]">
+                   תיקון קוראים
+                 </div>
+                 <TorahView aliyot={data.aliyot} />
+              </div>
 
-          {/* Right: Taj (Source) */}
-          <div className="h-full overflow-hidden flex flex-col bg-white">
-             <div className="bg-gray-50 p-2 text-center text-xs font-bold text-gray-500 border-b border-gray-200">
-               מקור (תאג׳)
+              {/* Right: Taj (Source) */}
+              <div className="h-full overflow-hidden flex flex-col bg-white">
+                 <div className="bg-gray-50 p-2 text-center text-xs font-bold text-gray-500 border-b border-gray-200">
+                   מקור (תאג׳)
+                 </div>
+                 <TajView aliyot={data.aliyot} />
+              </div>
+            </div>
+          ) : (
+             <div className="h-full bg-[#fcf5e5]">
+               <CombinedView aliyot={data.aliyot} />
              </div>
-             <TajView aliyot={data.aliyot} />
-          </div>
+          )}
         </div>
 
-        {/* Mobile: Tabbed View */}
+        {/* Mobile View */}
         <div className="md:hidden h-full w-full">
-          {activeTab === 'torah' ? (
+          {mobileView === 'torah' && (
             <div className="h-full bg-[#fdfbf7]">
               <TorahView aliyot={data.aliyot} />
             </div>
-          ) : (
+          )}
+          {mobileView === 'taj' && (
             <div className="h-full bg-white">
               <TajView aliyot={data.aliyot} />
+            </div>
+          )}
+          {mobileView === 'combined' && (
+            <div className="h-full bg-[#fcf5e5]">
+              <CombinedView aliyot={data.aliyot} />
             </div>
           )}
         </div>
