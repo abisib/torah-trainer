@@ -7,7 +7,7 @@ import { useTorahData } from '../hooks/useTorahData';
 import { useSettings } from '../contexts/SettingsContext';
 import { type Book, type Parasha } from '../types';
 
-const ALIYAH_NAMES = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "הפטרה"];
+const ALIYAH_NAMES = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר", "הפטרה"];
 
 const Trainer: React.FC = () => {
   const { parashaId } = useParams<{ parashaId: string }>();
