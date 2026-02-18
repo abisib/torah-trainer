@@ -364,6 +364,31 @@ def process_parasha(parasha):
         
     aliyot_data, all_verses_flat = fetch_aliyah_data(ref_list)
 
+    # --- MAFTIR LOGIC (Standard) ---
+    if len(aliyot_data) >= 7:
+        last_aliyah = aliyot_data[6]
+        last_verses = last_aliyah['verses']
+        
+        if len(last_verses) >= 3:
+            maftir_verses = last_verses[-3:]
+            
+            start_v = maftir_verses[0]
+            end_v = maftir_verses[-1]
+            book_name = parasha['ref'].split()[0] 
+            
+            if start_v['chapter'] == end_v['chapter']:
+                maftir_range = f"{book_name} {start_v['chapter']}:{start_v['verse']}-{end_v['verse']}"
+            else:
+                maftir_range = f"{book_name} {start_v['chapter']}:{start_v['verse']}-{end_v['chapter']}:{end_v['verse']}"
+            
+            maftir_data = {
+                "num": 8, 
+                "range": maftir_range,
+                "verses": maftir_verses 
+            }
+            aliyot_data.insert(7, maftir_data)
+            print(f"  Generated Maftir (Standard): {maftir_range}")
+
     if not all_verses_flat:
         return False
         
@@ -380,13 +405,8 @@ def process_parasha(parasha):
     # Normalize ID to lowercase for lookup
     p_id = parasha['id'].lower().replace("parashat ", "").replace("parshat ", "").replace(" ", "-")
     
-    # Direct lookup or fuzzy match? The IDs in manifest are like "korach", "chukat".
-    # Map file has "korach", "chukat".
-    
-    # Try to find a match in the overrides
     override = ALIYAH_OVERRIDES.get(p_id)
     if not override:
-        # Try simplified ID (e.g. "Parashat Korach" -> "korach")
         simplified_id = p_id.split("-")[-1] 
         override = ALIYAH_OVERRIDES.get(simplified_id)
 
@@ -395,6 +415,30 @@ def process_parasha(parasha):
         yem_ref_list = override.get('aliyot')
         if yem_ref_list:
             yem_aliyot_data, _ = fetch_aliyah_data(yem_ref_list)
+            
+            # --- MAFTIR LOGIC (Yemenite) ---
+            if len(yem_aliyot_data) >= 7:
+                last_aliyah = yem_aliyot_data[-1] 
+                last_verses = last_aliyah['verses']
+                if len(last_verses) >= 3:
+                    maftir_verses = last_verses[-3:]
+                    start_v = maftir_verses[0]
+                    end_v = maftir_verses[-1]
+                    book_name = parasha['ref'].split()[0] 
+                    
+                    if start_v['chapter'] == end_v['chapter']:
+                        maftir_range = f"{book_name} {start_v['chapter']}:{start_v['verse']}-{end_v['verse']}"
+                    else:
+                        maftir_range = f"{book_name} {start_v['chapter']}:{start_v['verse']}-{end_v['chapter']}:{end_v['verse']}"
+                    
+                    maftir_data = {
+                        "num": 8, 
+                        "range": maftir_range,
+                        "verses": maftir_verses 
+                    }
+                    yem_aliyot_data.append(maftir_data)
+                    print(f"  Generated Maftir (Yemenite): {maftir_range}")
+
             output_data["aliyot_yemenite"] = yem_aliyot_data
             output_data["ref_yemenite"] = override.get('ref')
             output_data["is_override"] = True

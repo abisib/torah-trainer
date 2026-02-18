@@ -77,11 +77,27 @@ const Trainer: React.FC = () => {
     ? data.aliyot_yemenite
     : (data?.aliyot || []);
 
+  // SAFETY NET: Ensure Maftir exists (index 7) if missing in source
+  // If torahAliyot has only 7 items (indices 0-6), duplicate the last 3 verses of the 7th as Maftir.
+  let finalTorahAliyot = [...torahAliyot];
+  if (finalTorahAliyot.length === 7) {
+      const seventh = finalTorahAliyot[6];
+      if (seventh && seventh.verses.length >= 3) {
+          const maftirVerses = seventh.verses.slice(-3);
+          const maftirAliyah = {
+              num: 8,
+              range: "Maftir (Generated)",
+              verses: maftirVerses
+          };
+          finalTorahAliyot.push(maftirAliyah);
+      }
+  }
+
   const haftaraAliyah = (nusach === 'yemenite' && data?.haftara_yemenite)
     ? data.haftara_yemenite
     : data?.haftara;
 
-  const aliyotList = haftaraAliyah ? [...torahAliyot, haftaraAliyah] : torahAliyot;
+  const aliyotList = haftaraAliyah ? [...finalTorahAliyot, haftaraAliyah] : finalTorahAliyot;
 
   const currentAliyah = aliyotList[currentAliyahIndex];
   // Guard against undefined if switching mid-stream
